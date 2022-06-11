@@ -1,8 +1,10 @@
 import argparse
 from pathlib import Path
-from packaging.version import parse as parse_version
-from sh import wget, tar, python, find
 from shutil import copytree, rmtree
+import tempfile
+
+from sh import wget, tar, python, find
+from packaging.version import parse as parse_version
 
 parser = argparse.ArgumentParser()
 parser.add_argument("version")
@@ -26,11 +28,27 @@ if __name__ == "__main__":
     else:
         unpack = base
 
-    url = f"https://github.com/OSGeo/gdal/archive/v{args.version}.tar.gz"
-    tar(
-        wget(url, "-O", "-"),
-        "xz", "--strip-components=4", "-C", str(unpack),
-        f"gdal-{args.version}/gdal/swig/python")
+    with tempfile.NamedTemporaryFile(suffix=".tar.gz") as fh:
+        archive = f"v{args.version}.tar.gz"
+        url = f"https://github.com/OSGeo/gdal/archive/{archive}"
+
+        try:
+            wget(url, "-O", fh.name)
+        except Exception:
+            raise RuntimeError(f"Error downloading GDAL archive: {url}")
+
+        try:
+            tar(
+                "xzf", fh.name,
+                "--strip-components=4", "-C", str(unpack),
+                f"gdal-{args.version}/gdal/swig/python"
+            )
+        except Exception:
+            tar(
+                "xzf", fh.name,
+                "--strip-components=3", "-C", str(unpack),
+                f"gdal-{args.version}/swig/python"
+            )
     
     for d in ("samples", "scripts", "gdal-utils"):
         if (unpack / d).is_dir():
