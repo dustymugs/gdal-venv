@@ -1,6 +1,8 @@
 #
 # docker build -f Dockerfile -t dustymugs/pygdal-deploy:latest .
 #
+# docker run --rm -e GITHUB_TOKEN=YOUR_GITHUB_TOKEN dustymugs/pygdal-deploy:latest version 3.4.2
+#
 
 FROM ubuntu:20.04
 
@@ -50,6 +52,9 @@ RUN cd /home/${PYGDAL_USER} && \
     . $USER_VENV/bin/activate && \
     pip install --upgrade pip packaging sh && \
     pip cache purge
+
+RUN git config --global user.email "dustymugs@gmail.com" && \
+    git config --global user.name "Bborie Park (bot)"
 
 WORKDIR /home/${PYGDAL_USER}
 ENTRYPOINT ["/entrypoint.sh"]
