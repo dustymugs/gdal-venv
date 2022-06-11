@@ -1,3 +1,11 @@
+NOTE
+====
+
+This is a fork of nextgis/pygdal. The goal of this fork is to automatically support new GDAL releases as those releases are made.
+
+PyPI packages from this repo are available as `venv-gdal` so as to not overlap with upstream
+
+
 pygdal
 ======
 
