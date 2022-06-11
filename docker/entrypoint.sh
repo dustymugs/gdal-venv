@@ -13,7 +13,7 @@ if [ "$1" == version ]; then
 
   VERSION="$2"
   BRANCH="v$VERSION"
-  MESSAGE="add support for $VERSION"
+  MESSAGE="Add GDAL $VERSION"
 
   git checkout -b "$BRANCH"
   python import.py "$VERSION"
@@ -22,7 +22,7 @@ if [ "$1" == version ]; then
   git commit -m "$MESSAGE"
   git push origin "$BRANCH"
   gh pr create -B master --title "$MESSAGE" --body "Done by deploy docker image"
-	gh pr merge -m -b "automated merge" "$BRANCH}"
+	gh pr merge -m -b "automated merge" "$BRANCH"
 else
   exec "$@"
 fi
