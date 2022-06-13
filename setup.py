@@ -80,7 +80,7 @@ int main () { return 0; }""")
 
 class gdal_ext(build_ext):
 
-    GDAL_CONFIG = 'gdal-config'
+    GDAL_CONFIG = os.getenv('GDAL_CONFIG') or 'gdal-config'
 
     def run(self):
         inst_gdal_version = self.get_gdal_config('version')
@@ -185,21 +185,26 @@ ext_modules = [
 packages =  find_packages(where=PACKAGE_DIR)
 # raise Exception(packages)
 
-name = 'pygdal'
+name = 'gdal-venv'
 version = GDAL_VERSION + '.' + PKG_VERSION
 
 author = "Frank Warmerdam"
 author_email = "warmerdam@pobox.com"
 
-maintainer = "Aleksandr Dezhin"
-maintainer_email = "me@dezhin.net"
+maintainer = "Bborie Park"
+maintainer_email = "dustymugs@gmail.com"
 
-description = "Virtualenv and setuptools friendly " \
-    + "version of standard GDAL python bindings"
+description = """
+This is a fork of nextgis/pygdal. The goal of this fork is to automatically support new GDAL releases as those releases are made.
+
+PyPI packages from this repo are available as gdal-venv so as to not overlap with upstream
+
+Virtualenv and setuptools friendly version of standard GDAL python bindings"""
+
 
 long_description = str(open('README.rst', 'rb').read())
 
-url = "https://github.com/nextgis/pygdal"
+url = "https://github.com/dustymugs/pygdal"
 
 license = "MIT"
 

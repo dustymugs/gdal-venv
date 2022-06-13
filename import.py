@@ -28,27 +28,28 @@ if __name__ == "__main__":
     else:
         unpack = base
 
-    with tempfile.NamedTemporaryFile(suffix=".tar.gz") as fh:
-        archive = f"v{args.version}.tar.gz"
-        url = f"https://github.com/OSGeo/gdal/archive/{archive}"
+    archive = f"v{args.version}.tar.gz"
+    url = f"https://github.com/OSGeo/gdal/archive/{archive}"
+    local = Path(f"/tmp/{archive}")
 
+    if not local.exists():
         try:
-            wget(url, "-O", fh.name)
+            wget(url, "-O", str(local))
         except Exception:
             raise RuntimeError(f"Error downloading GDAL archive: {url}")
 
-        try:
-            tar(
-                "xzf", fh.name,
-                "--strip-components=4", "-C", str(unpack),
-                f"gdal-{args.version}/gdal/swig/python"
-            )
-        except Exception:
-            tar(
-                "xzf", fh.name,
-                "--strip-components=3", "-C", str(unpack),
-                f"gdal-{args.version}/swig/python"
-            )
+    try:
+        tar(
+            "xzf", str(local),
+            "--strip-components=4", "-C", str(unpack),
+            f"gdal-{args.version}/gdal/swig/python"
+        )
+    except Exception:
+        tar(
+            "xzf", str(local),
+            "--strip-components=3", "-C", str(unpack),
+            f"gdal-{args.version}/swig/python"
+        )
     
     for d in ("samples", "scripts", "gdal-utils"):
         if (unpack / d).is_dir():
