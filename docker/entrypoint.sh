@@ -51,7 +51,7 @@ if [ "$1" == version ]; then
 		export PATH="$(pwd)/apps:$PATH"
 
 		cd /home/pygdal/pygdal
-		publish $VERSION
+		./publish $VERSION
 	fi
 else
   exec "$@"
