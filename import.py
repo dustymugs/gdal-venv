@@ -13,6 +13,7 @@ parser.add_argument("version")
 if __name__ == "__main__":
     args = parser.parse_args()
 
+    import ipdb;ipdb.set_trace()
     base = Path(__file__ + "/../" + args.version).resolve()
     if base.is_dir():
         rmtree(base)
@@ -51,6 +52,8 @@ if __name__ == "__main__":
             f"gdal-{args.version}/swig/python"
         )
     
+    copytree(unpack / "gdal-utils" / "osgeo_utils", unpack / "osgeo_utils", dirs_exist_ok=True)
+
     for d in ("samples", "scripts", "gdal-utils"):
         if (unpack / d).is_dir():
             rmtree(unpack / d)
