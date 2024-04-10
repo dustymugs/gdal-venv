@@ -1,10 +1,8 @@
 import argparse
 from pathlib import Path
-from shutil import copytree, rmtree
-import tempfile
-
-from sh import wget, tar, python, find
 from packaging.version import parse as parse_version
+from sh import wget, tar, python, find
+from shutil import copytree, rmtree
 
 parser = argparse.ArgumentParser()
 parser.add_argument("version")
@@ -28,35 +26,27 @@ if __name__ == "__main__":
     else:
         unpack = base
 
-    archive = f"v{args.version}.tar.gz"
-    url = f"https://github.com/OSGeo/gdal/archive/{archive}"
-    local = Path(f"/tmp/{archive}")
+    url = f"https://github.com/OSGeo/gdal/archive/v{args.version}.tar.gz"
 
-    if not local.exists():
-        try:
-            wget(url, "-O", str(local))
-        except Exception:
-            raise RuntimeError(f"Error downloading GDAL archive: {url}")
+    if parse_version(args.version) < parse_version("3.5"):
 
-    try:
         tar(
-            "xzf", str(local),
-            "--strip-components=4", "-C", str(unpack),
-            f"gdal-{args.version}/gdal/swig/python"
-        )
-    except Exception:
+            wget(url, "-O", "-"),
+            "xz", "--strip-components=4", "-C", str(unpack),
+            f"gdal-{args.version}/gdal/swig/python")
+    else:
+
         tar(
-            "xzf", str(local),
-            "--strip-components=3", "-C", str(unpack),
-            f"gdal-{args.version}/swig/python"
-        )
-    
+            wget(url, "-O", "-"),
+            "xz", "--strip-components=3", "-C", str(unpack),
+            f"gdal-{args.version}/swig/python")
+
     copytree(
         unpack / "gdal-utils" / "osgeo_utils",
         unpack / "osgeo_utils",
         dirs_exist_ok=True
     )
-
+    
     for d in ("samples", "scripts", "gdal-utils"):
         if (unpack / d).is_dir():
             rmtree(unpack / d)
@@ -74,5 +64,5 @@ if __name__ == "__main__":
             str(py3))
 
     (base / 'GDAL_VERSION').write_text(args.version)
-    for s in ("setup.py", "MANIFEST.in", "README.rst"):
+    for s in ("setup.py", "MANIFEST.in", "README.md"):
         (base / s).symlink_to("../" + s)
