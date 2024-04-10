@@ -1,14 +1,14 @@
 #
-# docker build -f Dockerfile -t dustymugs/pygdal-deploy:latest .
+# docker build -f Dockerfile -t dustymugs/gdal-venv-deploy:latest .
 #
-# docker run --rm -e GITHUB_TOKEN=YOUR_GITHUB_TOKEN dustymugs/pygdal-deploy:latest version 3.4.2
+# docker run --rm -e GITHUB_TOKEN=YOUR_GITHUB_TOKEN dustymugs/gdal-venv-deploy:latest version 3.4.2
 #
 
 FROM ubuntu:20.04
 
 ARG DEBIAN_FRONTEND=noninteractive
-ARG PYGDAL_USER=pygdal
-ARG PYGDAL_PASSWORD=abc123
+ARG GDAL_VENV_USER=gdal
+ARG GDAL_VENV_PASSWORD=abc123
 
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
@@ -33,30 +33,30 @@ COPY entrypoint.sh /
 RUN chmod a+x /entrypoint.sh
 
 # add user
-RUN useradd -ms /bin/bash ${PYGDAL_USER} && \
-    usermod -a -G sudo,users ${PYGDAL_USER} && \
-    bash -c "echo ${PYGDAL_USER}:${PYGDAL_PASSWORD} | chpasswd"
+RUN useradd -ms /bin/bash ${GDAL_VENV_USER} && \
+    usermod -a -G sudo,users ${GDAL_VENV_USER} && \
+    bash -c "echo ${GDAL_VENV_USER}:${GDAL_VENV_PASSWORD} | chpasswd"
 
 #
 # user stuff
 #
 
-USER ${PYGDAL_USER}
+USER ${GDAL_VENV_USER}
 
-ENV USER_VENV="/home/${PYGDAL_USER}/${PYGDAL_USER}-venv"
+ENV USER_VENV="/home/${GDAL_VENV_USER}/venv"
 ENV GITHUB_TOKEN=""
 
 RUN git config --global user.email "dustymugs@gmail.com" && \
     git config --global user.name "Bborie Park (bot)"
 
-RUN cd /home/${PYGDAL_USER} && \
+RUN cd /home/${GDAL_VENV_USER} && \
     mkdir ${USER_VENV} && \
     python3 -m venv "${USER_VENV}" && \
-    echo "source \"${USER_VENV}/bin/activate\"" >> /home/${PYGDAL_USER}/.bashrc && \
+    echo "source \"${USER_VENV}/bin/activate\"" >> /home/${GDAL_VENV_USER}/.bashrc && \
     . $USER_VENV/bin/activate && \
     pip install --upgrade pip packaging twine sh numpy && \
     pip cache purge
 
-WORKDIR /home/${PYGDAL_USER}
+WORKDIR /home/${GDAL_VENV_USER}
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/bin/bash"]
