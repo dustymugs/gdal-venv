@@ -27,7 +27,7 @@ if [ "$1" == version ]; then
   git add .
   git commit -m "$MESSAGE"
   git push origin "$BRANCH"
-  gh pr create -B master --title "$MESSAGE" --body "Done by deploy docker image"
+  gh pr create -B main --title "$MESSAGE" --body "Done by deploy docker image"
   gh pr merge -m -b "automated merge" "$BRANCH"
 
   if [ -n "$PUBLISH" ]; then
