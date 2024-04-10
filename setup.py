@@ -9,7 +9,7 @@ from setuptools.command.build_ext import build_ext
 from distutils.errors import CompileError
 
 GDAL_VERSION = open('GDAL_VERSION', 'r').read().strip()
-PKG_VERSION = '10'
+PKG_VERSION = '12'
 
 ENV_GDALHOME = 'GDALHOME'
 
@@ -24,10 +24,16 @@ python_requires = '>=3.6' if GVP >= (3, 3) else None
 class GDALConfigError(Exception):
     pass
 
+def set_builtin(name, value):
+    if isinstance(__builtins__, dict):
+        __builtins__[name] = value
+    else:
+        setattr(__builtins__, name, value)
+
 
 def get_numpy_include():
     # Fix numpy installation using setuptools
-    __builtins__.__NUMPY_SETUP__ = False
+    set_builtin('__NUMPY_SETUP__', False)
 
     import numpy
     return numpy.get_include()
@@ -80,7 +86,7 @@ int main () { return 0; }""")
 
 class gdal_ext(build_ext):
 
-    GDAL_CONFIG = os.getenv('GDAL_CONFIG') or 'gdal-config'
+    GDAL_CONFIG = 'gdal-config'
 
     def run(self):
         inst_gdal_version = self.get_gdal_config('version')
@@ -185,26 +191,21 @@ ext_modules = [
 packages =  find_packages(where=PACKAGE_DIR)
 # raise Exception(packages)
 
-name = 'gdal-venv'
+name = 'pygdal'
 version = GDAL_VERSION + '.' + PKG_VERSION
 
 author = "Frank Warmerdam"
 author_email = "warmerdam@pobox.com"
 
-maintainer = "Bborie Park"
-maintainer_email = "dustymugs@gmail.com"
+maintainer = "Aleksandr Dezhin"
+maintainer_email = "me@dezhin.net"
 
-description = """
-This is a fork of nextgis/pygdal. The goal of this fork is to automatically support new GDAL releases as those releases are made.
+description = "Virtualenv and setuptools friendly " \
+    + "version of standard GDAL python bindings"
 
-PyPI packages from this repo are available as gdal-venv so as to not overlap with upstream
+long_description = str(open('README.md', 'r').read())
 
-Virtualenv and setuptools friendly version of standard GDAL python bindings"""
-
-
-long_description = str(open('README.rst', 'rb').read())
-
-url = "https://github.com/dustymugs/pygdal"
+url = "https://github.com/nextgis/pygdal"
 
 license = "MIT"
 
@@ -239,7 +240,7 @@ setup(
 
     description=description,
     long_description=long_description,
-    long_description_content_type='text/x-rst',
+    long_description_content_type='text/markdown',
     url=url,
 
     license=license,
